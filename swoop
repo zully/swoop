@@ -49,8 +49,9 @@ fi
 echo "-+- Executing [$@] on local server -+-"
 $@
 
-while read ip; do
+for ip in `cat /tmp/swoop-iterables`; do
     echo "-+- Executing [$@] on $ip -+-"
     ssh root@$ip $@
 done < /tmp/swoop-iterables
+
 rm -f /tmp/swoop-iterables
