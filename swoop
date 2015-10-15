@@ -11,13 +11,13 @@ fi
 
 # If any of the common server lists exist, then use them
 if [ -f /etc/lsyncd-servers.conf ]; then
-    cp /etc/lsyncd-servers.conf /etc/swoop-iterables
+    cp /etc/lsyncd-servers.conf /tmp/swoop-iterables
 elif [ -f /etc/lsyncd/servers.conf ]; then
-    cp /etc/lsyncd/servers.conf /etc/swoop-iterables
+    cp /etc/lsyncd/servers.conf /tmp/swoop-iterables
 fi
 
 # If unable to find a server list, then attempt to grep out ip list form most recently modified common config
-if [ ! -f /etc/swoop-iterables ]; then
+if [ ! -f /tmp/swoop-iterables ]; then
     if [ /etc/lsyncd.lua -nt /etc/lsyncd.conf ]; then
         if [ /etc/lsyncd.lua -nt /etc/lsyncd/lsyncd.conf ]; then
             filename=/etc/lsyncd.lua
@@ -35,13 +35,13 @@ if [ ! -f /etc/swoop-iterables ]; then
     if [ -n $filename ]; then
         exists=`egrep -v '^#' $filename | grep -c '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'`
         if [ $exists -gt 0 ]; then
-            egrep -v '^#' $filename | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' > /etc/swoop-iterables
+            egrep -v '^#' $filename | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' > /tmp/swoop-iterables
         fi
     fi
 fi
 
 # If this file doesn't exist at this point, terminate.
-if [ ! -f /etc/swoop-iterables ]; then
+if [ ! -f /tmp/swoop-iterables ]; then
     echo "Cannot locate an IP list to iterate over"
     exit
 fi
@@ -52,5 +52,5 @@ $@
 while read ip; do
     echo "-+- Executing [$@] on $ip -+-"
     ssh root@$ip $@
-done < /etc/swoop-iterables
-rm -f /etc/swoop-iterables
+done < /tmp/swoop-iterables
+rm -f /tmp/swoop-iterables
