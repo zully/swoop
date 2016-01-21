@@ -42,8 +42,8 @@ fi
 
 # If this file doesn't exist at this point, terminate.
 if [ ! -f /tmp/swoop-iterables ]; then
-    echo "Cannot locate an IP list to iterate over"
-    exit
+    echo "Error: cannot locate an IP list to iterate over"
+    exit 1
 fi
 
 echo "-+- Executing [$@] on local server -+-"
