@@ -6,3 +6,7 @@ Usage: swoop <command>
 Example: swoop service httpd restart
 ```
 
+One liner to install on Linux server:
+```
+wget -P /usr/local/sbin/ https://raw.githubusercontent.com/zully/swoop/master/swoop && chmod +x /usr/local/sbin/swoop
+```
