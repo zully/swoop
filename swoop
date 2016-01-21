@@ -32,7 +32,7 @@ if [ ! -f /tmp/swoop-iterables ]; then
         fi
     fi
     # If a filename variable was set and it contains an IP, then grep out the IP list
-    if [ -n $filename ]; then
+    if [ ! -z $filename ]; then
         exists=`egrep -v '^#' $filename | grep -c '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'`
         if [ $exists -gt 0 ]; then
             egrep -v '^#' $filename | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' > /tmp/swoop-iterables
