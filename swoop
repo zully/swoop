@@ -13,10 +13,12 @@
 # Report bugs to Chris at zully_1@yahoo.com or https://github.com/zully/swoop  #
 ################################################################################
 
-import os, sys, re, subprocess
+import os, sys
+from subprocess import call
+from re import match
 
 # swoop version
-VERSION = 'v0.1b'
+VERSION = 'v0.2b'
 
 # user to swoop as
 USER='root'
@@ -37,7 +39,7 @@ def rFile(fname):
     f = open(fname, 'r')
     for line in f:
         line = line.strip('{}= ",\n')
-        if re.match('(\d+\.\d+\.\d+\.\d+)', line):
+        if match('(\d+\.\d+\.\d+\.\d+)', line):
             iplist.append(line)
     return iplist
 
@@ -92,7 +94,7 @@ def main(argv):
     # if we have made it this far, execute the command on all servers
     print '-+- Attempting [%s] on local server -+-' % command
     try:
-        subprocess.call(argv)
+        call(argv)
     except Exception, e:
         print e
         sys.exit(1)
@@ -103,7 +105,7 @@ def main(argv):
         for arg in argv:
             cmdlst.append(arg)
         try:
-            subprocess.call(cmdlst)
+            call(cmdlst)
         except Exception, e:
             print e
 
