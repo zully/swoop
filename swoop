@@ -3,12 +3,28 @@
 
 #################################################################################
 # A script to make executing a single command on multiple servers a little easier
+# Place in a directory where binaries live such as /usr/local/sbin, set executable
 # A work in progress by Chris Hidalgo <zully_1@yahoo.com>
 #################################################################################
 
 import os, sys, re
 
-def rfile(fname):
+# swoop version
+VERSION = 'v0.1'
+
+# user to swoop as
+USER='root'
+
+def pHelp(opt=''):
+    if len(opt) != 0 and 'h' not in opt and 'v' not in opt:
+        print 'swoop: illegal option -- ' + opt
+    elif 'v' in opt:
+        print 'swoop ' + VERSION
+    print '''usage: swoop [-h print_help] [-v print_version]
+             [command]'''
+    sys.exit(0)
+
+def rFile(fname):
     iplist = []
     f = open(fname, 'r')
     for line in f:
@@ -18,10 +34,12 @@ def rfile(fname):
     return iplist
 
 def main(argv):
-    # Make sure arguments are supplied to swoop
-    if len(sys.argv) == 1:
-        print 'Usage: swoop <command>'
-        sys.exit(0)
+    # check for arguments and print help if needed
+    if len(argv) == 0:
+        pHelp()
+    elif '-' in argv[0]:
+        pHelp(argv[0].strip('-'))
+      
 
     # Check if these files exist and set the filename
     if os.path.isfile('/etc/lsyncd-servers.conf'):
@@ -36,11 +54,11 @@ def main(argv):
     except:
         fname = None
     if fname != None:
-        iplist = rfile(fname)
+        iplist = rFile(fname)
 
     # If we havent found an iplist yet, try and find IPs in the newest config file
-    fdict = {}
     if len(iplist) == 0:
+        fdict = {}
         fnames = ['lsyncd.lua', 'lsyncd/lsyncd.conf', 'lsyncd.conf']
         for fname in fnames:
             fname = '/etc/' + fname
@@ -50,7 +68,7 @@ def main(argv):
 
         if len(fdict) != 0:
             fname = fdict[sorted(fdict.keys(), reverse=True)[0]]
-            iplist = rfile(fname)
+            iplist = rFile(fname)
 
     # If we havent found an IP list by now, exit
     if len(iplist) == 0:
@@ -59,7 +77,7 @@ def main(argv):
 
     # Formulate the command that will run on all servers
     command = ''
-    for arg in sys.argv[1:]:
+    for arg in argv:
         command += arg + ' '
     command = command.strip()
 
@@ -68,7 +86,7 @@ def main(argv):
     os.system(command)
     for ip in iplist:
         print '-+- Executing [%s] on %s -+-' % (command, ip)
-        os.system('ssh root@' + ip + ' ' + command)
+        os.system('ssh %s@%s %s' % (USER, ip, command))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
