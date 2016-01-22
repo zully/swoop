@@ -13,7 +13,7 @@
 # Report bugs to Chris at zully_1@yahoo.com or https://github.com/zully/swoop  #
 ################################################################################
 
-import os, sys, re
+import os, sys, re, subprocess
 
 # swoop version
 VERSION = 'v0.1b'
@@ -90,11 +90,22 @@ def main(argv):
     command = command.strip()
 
     # if we have made it this far, execute the command on all servers
-    print '-+- Executing [%s] on local server -+-' % command
-    os.system(command)
+    print '-+- Attempting [%s] on local server -+-' % command
+    try:
+        subprocess.call(argv)
+    except Exception, e:
+        print e
+        sys.exit(1)
     for ip in iplist:
-        print '-+- Executing [%s] on %s -+-' % (command, ip)
-        os.system('ssh %s@%s %s' % (USER, ip, command))
+        print '-+- Attempting [%s] on %s -+-' % (command, ip)
+        cmdlst = ['ssh']
+        cmdlst.append('%s@%s' % (USER, ip))
+        for arg in argv:
+            cmdlst.append(arg)
+        try:
+            subprocess.call(cmdlst)
+        except Exception, e:
+            print e
 
 if __name__ == '__main__':
     main(sys.argv[1:])
