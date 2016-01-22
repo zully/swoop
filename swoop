@@ -82,7 +82,7 @@ def main(argv):
 
     # if we havent found an IP list by now, give up
     if len(iplist) == 0:
-        print 'Error: Unable to locate IP list!'
+        print 'swoop: error -- unable to locate IP list!'
         sys.exit(1)
 
     # formulate the command that will run on all servers
@@ -96,7 +96,7 @@ def main(argv):
     try:
         call(argv)
     except Exception, e:
-        print e
+        print 'swoop: %s: cannot continue!' % e
         sys.exit(1)
     for ip in iplist:
         print '-+- Attempting [%s] on %s -+-' % (command, ip)
@@ -107,7 +107,7 @@ def main(argv):
         try:
             call(cmdlst)
         except Exception, e:
-            print e
+            print 'swoop: %s' % e
 
 if __name__ == '__main__':
     main(sys.argv[1:])
