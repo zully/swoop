@@ -16,11 +16,12 @@
 import os, sys, re
 
 # swoop version
-VERSION = 'v0.1'
+VERSION = 'v0.1b'
 
 # user to swoop as
 USER='root'
 
+# function to print help/version
 def pHelp(opt=''):
     if len(opt) != 0 and 'h' not in opt and 'v' not in opt:
         print 'swoop: illegal option -- ' + opt
@@ -30,12 +31,13 @@ def pHelp(opt=''):
              [command]'''
     sys.exit(0)
 
+# read iplist from file
 def rFile(fname):
     iplist = []
     f = open(fname, 'r')
     for line in f:
         line = line.strip('{}= ",\n')
-        if re.match('(\d+\.\d+\.\d+\.\d+)' , line):
+        if re.match('(\d+\.\d+\.\d+\.\d+)', line):
             iplist.append(line)
     return iplist
 
@@ -47,13 +49,13 @@ def main(argv):
         pHelp(argv[0].strip('-'))
       
 
-    # Check if these files exist and set the filename
+    # check if these files exist and set the filename
     if os.path.isfile('/etc/lsyncd-servers.conf'):
         fname = '/etc/lsyncd-servers.conf'
     elif os.path.isfile('/etc/lsyncd/servers.conf'):
         fname = '/etc/lsyncd/servers.conf'
 
-    # Check if filename variable is defined and if so read the file into an array
+    # check for filename variable and read into list if exists
     iplist = []
     try:
         fname
@@ -62,7 +64,7 @@ def main(argv):
     if fname != None:
         iplist = rFile(fname)
 
-    # If we havent found an iplist yet, try and find IPs in the newest config file
+    # if no iplist, try and find it out of most recently modified config
     if len(iplist) == 0:
         fdict = {}
         fnames = ['lsyncd.lua', 'lsyncd/lsyncd.conf', 'lsyncd.conf']
@@ -76,18 +78,18 @@ def main(argv):
             fname = fdict[sorted(fdict.keys(), reverse=True)[0]]
             iplist = rFile(fname)
 
-    # If we havent found an IP list by now, exit
+    # if we havent found an IP list by now, give up
     if len(iplist) == 0:
         print 'Error: Unable to locate IP list!'
         sys.exit(1)
 
-    # Formulate the command that will run on all servers
+    # formulate the command that will run on all servers
     command = ''
     for arg in argv:
         command += arg + ' '
     command = command.strip()
 
-    # If we have made it this far, execute on all
+    # if we have made it this far, execute the command on all servers
     print '-+- Executing [%s] on local server -+-' % command
     os.system(command)
     for ip in iplist:
