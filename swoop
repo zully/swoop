@@ -13,9 +13,12 @@
 # Report bugs to Chris at zully_1@yahoo.com or https://github.com/zully/swoop  #
 ################################################################################
 
-import os, sys
 from subprocess import call
 from re import match
+from os.path import isfile
+from os.path import getmtime
+from sys import argv
+from sys import exit
 
 # swoop version
 VERSION = 'v0.2b'
@@ -31,7 +34,7 @@ def pHelp(opt=''):
         print 'swoop ' + VERSION
     print '''usage: swoop [-h print_help] [-v print_version]
              [command]'''
-    sys.exit(0)
+    exit(0)
 
 # read iplist from file
 def rFile(fname):
@@ -43,18 +46,18 @@ def rFile(fname):
             iplist.append(line)
     return iplist
 
-def main(argv):
+def main(args):
     # check for arguments and print help if needed
-    if len(argv) == 0:
+    if len(args) == 0:
         pHelp()
-    elif '-' in argv[0]:
-        pHelp(argv[0].strip('-'))
+    elif '-' in args[0]:
+        pHelp(args[0].strip('-'))
       
 
     # check if these files exist and set the filename
-    if os.path.isfile('/etc/lsyncd-servers.conf'):
+    if isfile('/etc/lsyncd-servers.conf'):
         fname = '/etc/lsyncd-servers.conf'
-    elif os.path.isfile('/etc/lsyncd/servers.conf'):
+    elif isfile('/etc/lsyncd/servers.conf'):
         fname = '/etc/lsyncd/servers.conf'
 
     # check for filename variable and read into list if exists
@@ -72,9 +75,9 @@ def main(argv):
         fnames = ['lsyncd.lua', 'lsyncd/lsyncd.conf', 'lsyncd.conf']
         for fname in fnames:
             fname = '/etc/' + fname
-            if os.path.isfile(fname):
-                if os.path.getmtime(fname):
-                    fdict[os.path.getmtime(fname)] = fname
+            if isfile(fname):
+                if getmtime(fname):
+                    fdict[getmtime(fname)] = fname
 
         if len(fdict) != 0:
             fname = fdict[sorted(fdict.keys(), reverse=True)[0]]
@@ -83,26 +86,26 @@ def main(argv):
     # if we havent found an IP list by now, give up
     if len(iplist) == 0:
         print 'swoop: error -- unable to locate IP list!'
-        sys.exit(1)
+        exit(1)
 
     # formulate the command that will run on all servers
     command = ''
-    for arg in argv:
+    for arg in args:
         command += arg + ' '
     command = command.strip()
 
     # if we have made it this far, execute the command on all servers
     print '-+- Attempting [%s] on local server -+-' % command
     try:
-        call(argv)
+        call(args)
     except Exception, e:
         print 'swoop: %s: cannot continue!' % e
-        sys.exit(1)
+        exit(1)
     for ip in iplist:
         print '-+- Attempting [%s] on %s -+-' % (command, ip)
         cmdlst = ['ssh']
         cmdlst.append('%s@%s' % (USER, ip))
-        for arg in argv:
+        for arg in args:
             cmdlst.append(arg)
         try:
             call(cmdlst)
@@ -110,4 +113,4 @@ def main(argv):
             print 'swoop: %s' % e
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main(argv[1:])
