@@ -29,7 +29,7 @@ USER='root'
 # function to print help/version
 def pHelp(opt=''):
     if len(opt) != 0 and 'h' not in opt and 'v' not in opt:
-        print 'swoop: illegal option -- ' + opt
+        print 'swoop: illegal option(s) -- ' + opt
     elif 'v' in opt:
         print 'swoop ' + VERSION
     print '''usage: swoop [-h print_help] [-v print_version]
@@ -88,25 +88,20 @@ def main(args):
         print 'swoop: error -- unable to locate IP list!'
         exit(1)
 
-    # formulate the command that will run on all servers
-    command = ''
-    for arg in args:
-        command += arg + ' '
-    command = command.strip()
-
     # if we have made it this far, execute the command on all servers
-    print '-+- Attempting [%s] on local server -+-' % command
+    cmd = ' '.join(args)
+    print '-+- Attempting [%s] on local server -+-' % cmd
     try:
         call(args)
     except Exception, e:
-        print 'swoop: %s: cannot continue!' % e
+        print 'swoop: %s -- cannot continue!' % e
         exit(1)
+
     for ip in iplist:
-        print '-+- Attempting [%s] on %s -+-' % (command, ip)
+        print '-+- Attempting [%s] on %s -+-' % (cmd, ip)
         cmdlst = ['ssh']
         cmdlst.append('%s@%s' % (USER, ip))
-        for arg in args:
-            cmdlst.append(arg)
+        cmdlst.extend(args)
         try:
             call(cmdlst)
         except Exception, e:
