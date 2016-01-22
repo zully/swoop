@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#################################################################################
+# A script to make executing a single command on multiple servers a little easier
+# A work in progress by Chris Hidalgo <zully_1@yahoo.com>
+#################################################################################
+
+import os, sys, re
+
+def rfile(fname):
+    iplist = []
+    f = open(fname, 'r')
+    for line in f:
+        line = line.strip('{}= ",\n')
+        if re.match('(\d+\.\d+\.\d+\.\d+)' , line):
+            iplist.append(line)
+    return iplist
+
+def main(argv):
+    # Make sure arguments are supplied to swoop
+    if len(sys.argv) == 1:
+        print 'Usage: swoop <command>'
+        sys.exit(0)
+
+    # Check if these files exist and set the filename
+    if os.path.isfile('/etc/lsyncd-servers.conf'):
+        fname = '/etc/lsyncd-servers.conf'
+    elif os.path.isfile('/etc/lsyncd/servers.conf'):
+        fname = '/etc/lsyncd/servers.conf'
+
+    # Check if filename variable is defined and if so read the file into an array
+    iplist = []
+    try:
+        fname
+    except:
+        fname = None
+    if fname != None:
+        iplist = rfile(fname)
+
+    # If we havent found an iplist yet, try and find IPs in the newest config file
+    fdict = {}
+    if len(iplist) == 0:
+        fnames = ['lsyncd.lua', 'lsyncd/lsyncd.conf', 'lsyncd.conf']
+        for fname in fnames:
+            fname = '/etc/' + fname
+            if os.path.isfile(fname):
+                if os.path.getmtime(fname):
+                    fdict[os.path.getmtime(fname)] = fname
+
+        if len(fdict) != 0:
+            fname = fdict[sorted(fdict.keys(), reverse=True)[0]]
+            iplist = rfile(fname)
+
+    # If we havent found an IP list by now, exit
+    if len(iplist) == 0:
+        print 'Error: Unable to locate IP list!'
+        sys.exit(1)
+
+    # Formulate the command that will run on all servers
+    command = ''
+    for arg in sys.argv[1:]:
+        command += arg + ' '
+    command = command.strip()
+
+    # If we have made it this far, execute on all
+    print '-+- Executing [%s] on local server -+-' % command
+    os.system(command)
+    for ip in iplist:
+        print '-+- Executing [%s] on %s -+-' % (command, ip)
+        os.system('ssh root@' + ip + ' ' + command)
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
