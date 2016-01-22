@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#################################################################################
-# A script to make executing a single command on multiple servers a little easier
-# Place in a directory where binaries live such as /usr/local/sbin, set executable
-# A work in progress by Chris Hidalgo <zully_1@yahoo.com>
-#################################################################################
+################################################################################
+# A script to make executing a single command on multiple servers a little     #
+# easier.  Place in a directory where binaries live such as /usr/local/sbin    #
+# and set executable.                                                          #
+#                                                                              #
+# usage: swoop [-h print_help] [-v print_version]                              #
+#              [command]                                                       #
+# Example:  swoop service httpd reload                                         #
+#                                                                              #
+# Report bugs to Chris at zully_1@yahoo.com or https://github.com/zully/swoop  #
+################################################################################
 
 import os, sys, re
 
