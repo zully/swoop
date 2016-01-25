@@ -43,7 +43,8 @@ def rFile(fname):
     for line in f:
         line = line.strip('{}= ",\n')
         if match('(\d+\.\d+\.\d+\.\d+)', line):
-            iplist.append(line)
+             iplist.append(line)
+    f.close()
     return iplist
 
 def main(args):
@@ -52,6 +53,9 @@ def main(args):
         pHelp()
     elif '-' in args[0]:
         pHelp(args[0].strip('-'))
+    elif args[0] == 'rm':
+        print 'swoop: "rm" is not an allowed command!'
+        pHelp()
       
 
     # check if these files exist and set the filename
