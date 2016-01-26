@@ -96,9 +96,12 @@ def main(args):
         exit(1)
 
     # if we have made it this far, execute the command on all servers
+    for i in range(0,len(args)):
+        if ' ' in args[i]:
+            args[i] = "\'%s\'" % args[i]
     cmd = ' '.join(args)
+    
     print '-+- Attempting [%s] on local server -+-' % cmd
-   
     system(cmd)
 
     for ip in iplist:
