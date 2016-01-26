@@ -13,8 +13,6 @@
 # Report bugs to Chris at zully_1@yahoo.com or https://github.com/zully/swoop  #
 ################################################################################
 
-from subprocess import call
-from subprocess import check_call
 from re import match
 from os.path import isfile
 from os.path import getmtime
@@ -43,15 +41,20 @@ def rFile(fname):
     iplist = []
     f = open(fname, 'r')
     for line in f:
-        line = line.strip('{}= ",\n')
-        if match('(\d+\.\d+\.\d+\.\d+)', line):
-             iplist.append(line)
+        if '"' in line:
+            ds = line.split('"')
+        elif "'" in line:
+            ds = line.split("'")
+        else:
+            ds = ([line])
+        for d in ds:
+            if match('(\d+\.\d+\.\d+\.\d+)', d):
+                iplist.append(d)
     f.close()
     return iplist
 
 def main(args):
     # check for arguments and print help if needed
-    print args[0]
     if len(args) == 0:
         pHelp()
     elif args[0].startswith('-'):
