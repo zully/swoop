@@ -16,7 +16,7 @@
 import re, os, sys
 
 # swoop version
-VERSION = 'v0.56b'
+VERSION = 'v0.57b'
 
 # user to swoop as
 USER='root'
@@ -46,7 +46,7 @@ def rFile(fname):
         if not re.search('\A#', ds[0]):
             for d in ds:
                 if re.match('(\d+\.\d+\.\d+\.\d+)', d):
-                    iplist.append(d)
+                    iplist.append(d.strip('\n'))
     f.close()
     return iplist
 
@@ -57,7 +57,7 @@ def main(args):
     elif args[0].startswith('-'):
         pHelp(args[0].strip('-'))
     elif ' ' in args[0]:
-        print 'swoop: Do not surround your command in quotes'
+        print 'swoop: Do not enclose your command in quotes'
         pHelp()
     else:
         deny_cmds = ['rm', 'poweroff', 'shutdown', 'reboot', 'halt']
@@ -66,10 +66,12 @@ def main(args):
             pHelp()
 
     # check if these files exist and set the filename
-    if os.path.isfile('/etc/lsyncd-servers.conf'):
-        fname = '/etc/lsyncd-servers.conf'
-    elif os.path.isfile('/etc/lsyncd/servers.conf'):
-        fname = '/etc/lsyncd/servers.conf'
+    configs = ['lsyncd-servers.conf', 'lsyncd/servers.conf']
+    for config in configs:
+        filename = '/etc/' + config
+        if os.path.isfile(filename):
+            fname = filename
+            break
 
     # check for filename variable and read into list if exists
     iplist = []
