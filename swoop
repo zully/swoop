@@ -14,9 +14,11 @@
 ################################################################################
 
 from subprocess import call
+from subprocess import check_call
 from re import match
 from os.path import isfile
 from os.path import getmtime
+from os import system
 from sys import argv
 from sys import exit
 
@@ -51,7 +53,7 @@ def main(args):
     # check for arguments and print help if needed
     if len(args) == 0:
         pHelp()
-    elif '-' in args[0]:
+    elif args[0].startswith('-'):
         pHelp(args[0].strip('-'))
     else:
         deny_cmds = ['rm', 'poweroff', 'shutdown', 'reboot', 'halt']
@@ -96,21 +98,13 @@ def main(args):
     # if we have made it this far, execute the command on all servers
     cmd = ' '.join(args)
     print '-+- Attempting [%s] on local server -+-' % cmd
-    try:
-        call(args)
-    except Exception, e:
-        print 'swoop: %s -- cannot continue!' % e
-        exit(1)
+   
+    system(cmd)
 
     for ip in iplist:
         print '-+- Attempting [%s] on %s -+-' % (cmd, ip)
-        cmdlst = ['ssh']
-        cmdlst.append('%s@%s' % (USER, ip))
-        cmdlst.extend(args)
-        try:
-            call(cmdlst)
-        except Exception, e:
-            print 'swoop: %s' % e
+        rCmd = 'ssh %s@%s %s' % (USER, ip, cmd)
+        system(rCmd)
 
 if __name__ == '__main__':
     main(argv[1:])
