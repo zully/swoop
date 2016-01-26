@@ -21,7 +21,7 @@ from sys import argv
 from sys import exit
 
 # swoop version
-VERSION = 'v0.3b'
+VERSION = 'v0.51b'
 
 # user to swoop as
 USER='root'
