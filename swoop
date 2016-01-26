@@ -53,10 +53,11 @@ def main(args):
         pHelp()
     elif '-' in args[0]:
         pHelp(args[0].strip('-'))
-    elif args[0] == 'rm':
-        print 'swoop: "rm" is not an allowed command!'
-        pHelp()
-      
+    else:
+        deny_cmds = ['rm', 'poweroff', 'shutdown', 'reboot', 'halt']
+        if args[0] in deny_cmds:
+            print 'swoop: "%s" is not an allowed command!' % args[0]
+            pHelp()
 
     # check if these files exist and set the filename
     if isfile('/etc/lsyncd-servers.conf'):
