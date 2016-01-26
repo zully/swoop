@@ -51,10 +51,14 @@ def rFile(fname):
 
 def main(args):
     # check for arguments and print help if needed
+    print args[0]
     if len(args) == 0:
         pHelp()
     elif args[0].startswith('-'):
         pHelp(args[0].strip('-'))
+    elif ' ' in args[0]:
+        print 'swoop: Do not surround your command in quotes'
+        pHelp()
     else:
         deny_cmds = ['rm', 'poweroff', 'shutdown', 'reboot', 'halt']
         if args[0] in deny_cmds:
