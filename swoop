@@ -14,6 +14,7 @@
 ################################################################################
 
 from re import match
+from re import search
 from os.path import isfile
 from os.path import getmtime
 from os import system
@@ -21,7 +22,7 @@ from sys import argv
 from sys import exit
 
 # swoop version
-VERSION = 'v0.51b'
+VERSION = 'v0.53b'
 
 # user to swoop as
 USER='root'
@@ -47,10 +48,13 @@ def rFile(fname):
             ds = line.split("'")
         else:
             ds = ([line])
-        for d in ds:
-            if match('(\d+\.\d+\.\d+\.\d+)', d):
-                iplist.append(d)
+        if not search('\A#', ds[0]):
+            for d in ds:
+                if match('(\d+\.\d+\.\d+\.\d+)', d):
+                    iplist.append(d)
     f.close()
+    print iplist
+    exit(1)
     return iplist
 
 def main(args):
