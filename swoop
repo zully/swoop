@@ -10,7 +10,7 @@
 #              [command]                                                       #
 # Example:  swoop service httpd reload                                         #
 #                                                                              #
-# Report bugs to Chris at zully_1@yahoo.com or https://github.com/zully/swoop  #
+# Report bugs to https://github.com/zully/swoop                                #
 ################################################################################
 
 import re, os, sys
